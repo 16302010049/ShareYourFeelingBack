@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.UserMapper">
+
+    <select id="findUserByUsername" parameterType="java.lang.String" resultType="com.example.hello.myBatis.po.User">
+    select * from User where name = #{name}
+  </select>
+
+    <insert id="addUser" parameterType="com.example.hello.myBatis.po.User" useGeneratedKeys="true" keyProperty="id">
+    insert into User(name, mailbox, sex, pass, birthday, signature, imageurl, tags)
+    values (#{name}, #{mailbox}, #{sex}, #{pass},#{birthday},#{signature},#{imageurl},#{tags})
+  </insert>
+
+    <insert id="addBlog" parameterType="com.example.hello.myBatis.po.Blog" useGeneratedKeys="true" keyProperty="id">
+        insert into blog(content, commentNum, tranNum, zanNum, author, date, imageList,avatarUrl) VALUE (#{content},#{commentNum},#{tranNum},#{zanNum},#{author},#{date},#{imageList},#{avatarUrl})
+    </insert>
+
+    <select id="selectBlogPage"  resultType="com.example.hello.myBatis.po.Blog">
+        select
+        *
+        from blog
+    </select>
+
+    <select id="searchBlogPage" parameterType="String" resultType="com.example.hello.myBatis.po.Blog">
+        select * from blog where locate(#{str},content) or locate(#{str},author)
+    </select>
+
+    <insert id="addComment" parameterType="com.example.hello.request.AddCommentRequest" useGeneratedKeys="true" keyProperty="id">
+        insert into comment(blogId, avatarUrl, author, content, time) VALUE (#{blogId},#{avatarUrl},#{author},#{content},#{time})
+    </insert>
+
+    <select id="getPageComment" parameterType="Integer" resultType="com.example.hello.myBatis.po.Comment">
+        select * from comment where blogId = #{blogId}
+    </select>
+
+</mapper>
