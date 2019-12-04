@@ -19,8 +19,47 @@ public class UserRegisterRequest {
 
     private String signature;
 
-
     private MultipartFile file;
+
+    private int blogNum;
+
+    private int guanNum;
+
+    private int fansNum;
+
+    private String backgroundUrl;
+
+    public int getBlogNum() {
+        return blogNum;
+    }
+
+    public void setBlogNum(int blogNum) {
+        this.blogNum = blogNum;
+    }
+
+    public int getGuanNum() {
+        return guanNum;
+    }
+
+    public void setGuanNum(int guanNum) {
+        this.guanNum = guanNum;
+    }
+
+    public int getFansNum() {
+        return fansNum;
+    }
+
+    public void setFansNum(int fansNum) {
+        this.fansNum = fansNum;
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+
+    public void setBackgroundUrl(String backgroundUrl) {
+        this.backgroundUrl = backgroundUrl;
+    }
 
     public Integer getId() {
         return id;

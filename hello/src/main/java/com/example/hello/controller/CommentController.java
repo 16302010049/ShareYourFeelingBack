@@ -4,6 +4,7 @@ import com.example.hello.myBatis.SqlSessionLoader;
 import com.example.hello.myBatis.po.Blog;
 import com.example.hello.myBatis.po.Comment;
 import com.example.hello.request.AddCommentRequest;
+import com.example.hello.request.DeleteCommentRequest;
 import com.example.hello.request.GetPageCommentRequest;
 import com.example.hello.response.CommentResponse;
 import com.example.hello.response.CommonResponse;
@@ -45,5 +46,17 @@ public class CommentController {
        sqlSession.commit();
        sqlSession.close();
        return new PageCommentResponse(commentPageInfo.getPageNum(),commentPageInfo.getPageSize(),commentPageInfo.getTotal(),commentPageInfo.getPages(),commentPageInfo.getList());
+   }
+
+   @RequestMapping(value = "/deleteComment",method = RequestMethod.POST)
+    public @ResponseBody CommonResponse deleteComment(@RequestBody DeleteCommentRequest deleteCommentRequest) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       sqlSession.delete("hello.UserMapper.deleteComment",deleteCommentRequest.getCommentID());
+       Blog blog = sqlSession.selectOne("hello.UserMapper.getBlogByID",deleteCommentRequest.getBlogID());
+       blog.setCommentNum(blog.getCommentNum()-1);
+       sqlSession.update("hello.UserMapper.updateBlog",blog);
+       sqlSession.commit();
+       sqlSession.close();
+       return new CommonResponse("success");
    }
 }

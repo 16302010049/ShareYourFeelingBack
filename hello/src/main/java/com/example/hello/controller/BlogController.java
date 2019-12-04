@@ -2,6 +2,7 @@ package com.example.hello.controller;
 
 import com.example.hello.myBatis.SqlSessionLoader;
 import com.example.hello.myBatis.po.Blog;
+import com.example.hello.myBatis.po.User;
 import com.example.hello.request.AddBlogRequest;
 import com.example.hello.request.PageBlogRequest;
 import com.example.hello.request.SearchPageBlogRequest;
@@ -54,6 +55,9 @@ public class BlogController {
         Gson gson = new Gson();
         String imageList = gson.toJson(imageUrls);
         sqlSession.insert("hello.UserMapper.addBlog",new Blog(addBlogRequest.getContent(),addBlogRequest.getCommentNum(),addBlogRequest.getTranNum(),addBlogRequest.getZanNum(),addBlogRequest.getAuthorID(),addBlogRequest.getDate(),imageList));
+        User user = sqlSession.selectOne("hello.UserMapper.findUserByID",addBlogRequest.getAuthorID());
+        user.setBlogNum(user.getBlogNum()+1);
+        sqlSession.update("hello.UserMapper.updateUserBlogNum",user);
         sqlSession.commit();
         sqlSession.close();
         return new CommonResponse("success");

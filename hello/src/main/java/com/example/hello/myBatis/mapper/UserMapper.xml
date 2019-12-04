@@ -10,10 +10,28 @@
         where name = #{name}
     </select>
 
+    <select id="findUserByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
+        select id, name, sex, signature, imageurl, tags, blogNum, guanNum, fansNum, backgroundUrl
+        from user
+        where id = #{id}
+    </select>
+
+    <select id="getPageUser" parameterType="Integer" resultType="com.example.hello.myBatis.po.User">
+        select * from user where id != #{id}
+    </select>
+
     <insert id="addUser" parameterType="com.example.hello.myBatis.po.User" useGeneratedKeys="true" keyProperty="id">
-        insert into User(name, mailbox, sex, pass, birthday, signature, imageurl, tags)
-        values (#{name}, #{mailbox}, #{sex}, #{pass}, #{birthday}, #{signature}, #{imageurl}, #{tags})
+        insert into User(name, mailbox, sex, pass, birthday, signature, imageurl, tags, blogNum, guanNum, fansNum,
+                         backgroundUrl)
+        values (#{name}, #{mailbox}, #{sex}, #{pass}, #{birthday}, #{signature}, #{imageurl}, #{tags}, #{blogNum},
+                #{guanNum}, #{fansNum}, #{backgroundUrl})
     </insert>
+
+    <update id="updateUserBlogNum" parameterType="com.example.hello.myBatis.po.User">
+        update user
+        set blogNum = #{blogNum}
+        where id = #{id}
+    </update>
 
     <insert id="addBlog" parameterType="com.example.hello.myBatis.po.Blog" useGeneratedKeys="true" keyProperty="id">
         insert into blog(content, commentNum, tranNum, zanNum, authorID, date, imageList) VALUE (#{content},
@@ -52,7 +70,8 @@
                user.id AS authorID
         from blog,
              user
-        where blog.id = #{blogID} and user.id = authorID
+        where blog.id = #{blogID}
+          and user.id = authorID
     </select>
 
     <select id="searchBlogPage" parameterType="String" resultType="com.example.hello.response.BlogResponse">
@@ -68,8 +87,9 @@
                user.id AS authorID
         from blog,
              user
-        where user.id = authorID and (locate(#{str}, content)
-           or locate(#{str}, name))
+        where user.id = authorID
+          and (locate(#{str}, content)
+            or locate(#{str}, name))
     </select>
 
     <insert id="addComment" parameterType="com.example.hello.request.AddCommentRequest" useGeneratedKeys="true"
@@ -85,13 +105,69 @@
           and blogId = #{blogId}
     </select>
 
-   <select id="getBlogByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.Blog">
-       select * from blog where id = #{blogid}
-   </select>
+    <select id="getBlogByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.Blog">
+        select *
+        from blog
+        where id = #{blogid}
+    </select>
 
     <update id="updateBlog" parameterType="com.example.hello.myBatis.po.Blog">
-        update blog set content = #{content} , commentNum = #{commentNum},tranNum = #{tranNum},zanNum=#{zanNum},date = #{date},imageList = #{imageList},authorID = #{authorID}
+        update blog
+        set content    = #{content},
+            commentNum = #{commentNum},
+            tranNum    = #{tranNum},
+            zanNum=#{zanNum},
+            date       = #{date},
+            imageList  = #{imageList},
+            authorID   = #{authorID}
         where id = #{id}
     </update>
+
+    <insert id="addCollect" parameterType="com.example.hello.request.AddCollectRequest" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into collect(userID, blogID, time) VALUE (#{userID}, #{blogID}, #{time})
+    </insert>
+
+    <select id="checkCollect" parameterType="com.example.hello.request.CheckCollectRequest"
+            resultType="com.example.hello.myBatis.po.Collect">
+        select *
+        from collect
+        where blogID = #{blogID}
+          and userID = #{userID}
+    </select>
+
+    <delete id="deleteCollect" parameterType="com.example.hello.request.DelectCollectRequest">
+        delete
+        from collect
+        where userID = #{userID}
+          and blogID = #{blogID}
+    </delete>
+
+    <delete id="deleteComment" parameterType="Integer">
+        delete
+        from comment
+        where id = #{commentID}
+    </delete>
+
+    <insert id="addThumbsUp" parameterType="com.example.hello.request.AddThumbsUpRequest" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into thumbs_up(blogID, userID) VALUE (#{blogID}, #{userID})
+    </insert>
+
+    <select id="checkThumbsUp" parameterType="com.example.hello.request.CheckThumbsUpRequest"
+            resultType="com.example.hello.myBatis.po.ThumbsUp">
+        select *
+        from thumbs_up
+        where blogID = #{blogID}
+          and userID = #{userID}
+    </select>
+
+    <delete id="deleteThumbsUp" parameterType="com.example.hello.request.DeleteThumbsUpRequest">
+        delete
+        from thumbs_up
+        where userID = #{userID}
+          and blogID = #{blogID}
+    </delete>
+
 
 </mapper>

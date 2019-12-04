@@ -19,11 +19,19 @@ public class User {
 
     private String tags;
 
+    private int blogNum;
+
+    private int guanNum;
+
+    private int fansNum;
+
+    private String backgroundUrl;
+
     public User(){
 
     }
 
-    public User(String name, String mailbox, String sex, String pass, String birthday, String signature, String imageurl, String tags) {
+    public User(String name, String mailbox, String sex, String pass, String birthday, String signature, String imageurl, String tags, int blogNum, int guanNum, int fansNum, String backgroundUrl) {
         this.name = name;
         this.mailbox = mailbox;
         this.sex = sex;
@@ -32,6 +40,42 @@ public class User {
         this.signature = signature;
         this.imageurl = imageurl;
         this.tags = tags;
+        this.blogNum = blogNum;
+        this.guanNum = guanNum;
+        this.fansNum = fansNum;
+        this.backgroundUrl = backgroundUrl;
+    }
+
+    public int getBlogNum() {
+        return blogNum;
+    }
+
+    public void setBlogNum(int blogNum) {
+        this.blogNum = blogNum;
+    }
+
+    public int getGuanNum() {
+        return guanNum;
+    }
+
+    public void setGuanNum(int guanNum) {
+        this.guanNum = guanNum;
+    }
+
+    public int getFansNum() {
+        return fansNum;
+    }
+
+    public void setFansNum(int fansNum) {
+        this.fansNum = fansNum;
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+
+    public void setBackgroundUrl(String backgroundUrl) {
+        this.backgroundUrl = backgroundUrl;
     }
 
     public Integer getId() {

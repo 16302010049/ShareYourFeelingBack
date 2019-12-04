@@ -1,12 +1,14 @@
 package com.example.hello.controller;
 
 import com.example.hello.myBatis.SqlSessionLoader;
+import com.example.hello.myBatis.po.Other;
 import com.example.hello.myBatis.po.User;
+import com.example.hello.request.GetPageUserRequest;
 import com.example.hello.request.UserLoginRequest;
 import com.example.hello.request.UserRegisterRequest;
-import com.example.hello.response.ErrorResponse;
-import com.example.hello.response.LoginResponse;
-import com.example.hello.response.RegisterResponse;
+import com.example.hello.response.*;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +44,8 @@ public class UserController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            sqlSession.insert("hello.UserMapper.addUser", new User(request.getName(),request.getMailbox(),request.getSex(),request.getPass(),request.getBirthday(),request.getSignature(),"http://localhost:8080/img/"+fileName,request.getTags()));
+            sqlSession.insert("hello.UserMapper.addUser", new User(request.getName(),request.getMailbox(),request.getSex(),request.getPass(),request.getBirthday(),request.getSignature(),"http://localhost:8080/img/"+fileName,request.getTags()
+            ,request.getBlogNum(),request.getGuanNum(),request.getFansNum(),request.getBackgroundUrl()));
             sqlSession.commit();
             sqlSession.close();
             return new RegisterResponse("success"); // use your generated token here.
@@ -53,6 +56,7 @@ public class UserController {
     public @ResponseBody LoginResponse login(@RequestBody UserLoginRequest userLoginRequest) throws IOException{
         SqlSession sqlSession = SqlSessionLoader.getSqlSession();
         User user = sqlSession.selectOne("hello.UserMapper.findUserByUsername", userLoginRequest.getUsername());
+        sqlSession.commit();
         sqlSession.close();
         if(user==null){
             return new LoginResponse("用户名或密码错误",null);
@@ -62,9 +66,25 @@ public class UserController {
                 return new LoginResponse("success",user);
             }
             else {
-                return new LoginResponse("用户名或密码错误",null);
+                return new LoginResponse("用户名或密码错误", null);
             }
         }
     }
 
+    @RequestMapping(value = "/getPageUser",method = RequestMethod.POST)
+    public @ResponseBody PageUserResponse getPageUser(@RequestBody GetPageUserRequest getPageUserRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        int pageNum = getPageUserRequest.getPageNum();
+        int pageSize = getPageUserRequest.getPageSize();
+        PageHelper.startPage(pageNum,pageSize);
+        List<Other> users = sqlSession.selectList("hello.UserMapper.getPageUser",getPageUserRequest.getUserID());
+        PageInfo<Other> userPageInfo = new PageInfo<>(users);
+        PageUserResponse pageUserResponse = new PageUserResponse(userPageInfo.getPageNum(),userPageInfo.getPageSize(),userPageInfo.getTotal(),userPageInfo.getPages(),userPageInfo.getList());
+        sqlSession.commit();
+        sqlSession.close();
+        return pageUserResponse;
+    }
+
+   // @RequestMapping(value = "/getPageUserTags",method = RequestMethod.POST)
+   // public @ResponseBody PageUserResponse getPageTagsUser()
 }
