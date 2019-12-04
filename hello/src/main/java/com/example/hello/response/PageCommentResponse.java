@@ -10,9 +10,9 @@ public class PageCommentResponse {
     private int pageSize;
     private long totalSize;
     private long totalPage;
-    private List<Comment> content;
+    private List<CommentResponse> content;
 
-    public PageCommentResponse(int pageNum, int pageSize, long totalSize, long totalPage, List<Comment> content) {
+    public PageCommentResponse(int pageNum, int pageSize, long totalSize, long totalPage, List<CommentResponse> content) {
         this.pageNum = pageNum;
         this.pageSize = pageSize;
         this.totalSize = totalSize;
@@ -52,11 +52,11 @@ public class PageCommentResponse {
         this.totalPage = totalPage;
     }
 
-    public List<Comment> getContent() {
+    public List<CommentResponse> getContent() {
         return content;
     }
 
-    public void setContent(List<Comment> content) {
+    public void setContent(List<CommentResponse> content) {
         this.content = content;
     }
 }

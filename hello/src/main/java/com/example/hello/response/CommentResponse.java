@@ -1,11 +1,13 @@
-package com.example.hello.myBatis.po;
+package com.example.hello.response;
 
-public class Comment {
+public class CommentResponse {
     private int id;
     private int blogId;
     private int authorID;
     private String content;
     private String time;
+    private String name;
+    private String imageurl;
 
     public int getId() {
         return id;
@@ -45,5 +47,21 @@ public class Comment {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImageurl() {
+        return imageurl;
+    }
+
+    public void setImageurl(String imageurl) {
+        this.imageurl = imageurl;
     }
 }

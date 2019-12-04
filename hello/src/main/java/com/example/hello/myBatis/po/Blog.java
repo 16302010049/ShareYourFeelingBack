@@ -6,7 +6,7 @@ public class Blog {
     private int commentNum ;
     private int tranNum;
     private int zanNum;
-    private String author;
+    private int authorID;
     private String date;
     private String imageList;
 
@@ -18,21 +18,19 @@ public class Blog {
         this.id = id;
     }
 
-    private String avatarUrl;
 
     public Blog(){
 
     }
 
-    public Blog(String content, int commentNum, int tranNum, int zanNum, String author, String date, String imagelist, String avatarUrl) {
+    public Blog(String content, int commentNum, int tranNum, int zanNum, int authorID, String date, String imageList) {
         this.content = content;
         this.commentNum = commentNum;
         this.tranNum = tranNum;
         this.zanNum = zanNum;
-        this.author = author;
+        this.authorID = authorID;
         this.date = date;
-        this.imageList = imagelist;
-        this.avatarUrl = avatarUrl;
+        this.imageList = imageList;
     }
 
     public String getContent() {
@@ -67,12 +65,12 @@ public class Blog {
         this.zanNum = zanNum;
     }
 
-    public String getAuthor() {
-        return author;
+    public int getAuthorID() {
+        return authorID;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorID(int authorID) {
+        this.authorID = authorID;
     }
 
     public String getDate() {
@@ -87,15 +85,7 @@ public class Blog {
         return imageList;
     }
 
-    public void setImageList(String imagelist) {
-        this.imageList = imagelist;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setImageList(String imageList) {
+        this.imageList = imageList;
     }
 }

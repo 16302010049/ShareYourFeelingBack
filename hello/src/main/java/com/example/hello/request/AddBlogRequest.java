@@ -7,18 +7,9 @@ public class AddBlogRequest {
     private int commentNum ;
     private int tranNum;
     private int zanNum;
-    private String author;
+    private int authorID;
     private String date;
-    private String avatarUrl;
     private MultipartFile[] files;
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
 
     public String getContent() {
         return content;
@@ -52,12 +43,12 @@ public class AddBlogRequest {
         this.zanNum = zanNum;
     }
 
-    public String getAuthor() {
-        return author;
+    public int getAuthorID() {
+        return authorID;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorID(int authorID) {
+        this.authorID = authorID;
     }
 
     public String getDate() {

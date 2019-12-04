@@ -1,9 +1,11 @@
 package com.example.hello.controller;
 
 import com.example.hello.myBatis.SqlSessionLoader;
+import com.example.hello.myBatis.po.Blog;
 import com.example.hello.myBatis.po.Comment;
 import com.example.hello.request.AddCommentRequest;
 import com.example.hello.request.GetPageCommentRequest;
+import com.example.hello.response.CommentResponse;
 import com.example.hello.response.CommonResponse;
 import com.example.hello.response.PageCommentResponse;
 import com.github.pagehelper.PageHelper;
@@ -23,6 +25,9 @@ public class CommentController {
     public @ResponseBody CommonResponse addComment(@RequestBody AddCommentRequest addCommentRequest) throws IOException {
        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
        sqlSession.insert("hello.UserMapper.addComment",addCommentRequest);
+       Blog blog = sqlSession.selectOne("hello.UserMapper.getBlogByID",addCommentRequest.getBlogId());
+       blog.setCommentNum(blog.getCommentNum()+1);
+       sqlSession.update("hello.UserMapper.updateBlog",blog);
        sqlSession.commit();
        sqlSession.close();
        return new CommonResponse("success");
@@ -35,8 +40,8 @@ public class CommentController {
        int pageSize = getPageCommentRequest.getPageSize();
        String orderBy = "time DESC";
        PageHelper.startPage(pageNum,pageSize,orderBy);
-       List<Comment> comments = sqlSession.selectList("hello.UserMapper.getPageComment",getPageCommentRequest.getBlogId());
-       PageInfo<Comment> commentPageInfo = new PageInfo<>(comments);
+       List<CommentResponse> comments = sqlSession.selectList("hello.UserMapper.getPageComment",getPageCommentRequest.getBlogId());
+       PageInfo<CommentResponse> commentPageInfo = new PageInfo<>(comments);
        sqlSession.commit();
        sqlSession.close();
        return new PageCommentResponse(commentPageInfo.getPageNum(),commentPageInfo.getPageSize(),commentPageInfo.getTotal(),commentPageInfo.getPages(),commentPageInfo.getList());

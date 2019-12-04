@@ -2,8 +2,7 @@ package com.example.hello.request;
 
 public class AddCommentRequest {
     private int blogId;
-    private String avatarUrl;
-    private String author;
+    private int authorID;
     private String content;
     private String time;
 
@@ -15,20 +14,12 @@ public class AddCommentRequest {
         this.blogId = blogId;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public int getAuthorID() {
+        return authorID;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorID(int authorID) {
+        this.authorID = authorID;
     }
 
     public String getContent() {

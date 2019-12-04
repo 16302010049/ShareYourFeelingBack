@@ -5,34 +5,93 @@
 <mapper namespace="hello.UserMapper">
 
     <select id="findUserByUsername" parameterType="java.lang.String" resultType="com.example.hello.myBatis.po.User">
-    select * from User where name = #{name}
-  </select>
+        select *
+        from User
+        where name = #{name}
+    </select>
 
     <insert id="addUser" parameterType="com.example.hello.myBatis.po.User" useGeneratedKeys="true" keyProperty="id">
-    insert into User(name, mailbox, sex, pass, birthday, signature, imageurl, tags)
-    values (#{name}, #{mailbox}, #{sex}, #{pass},#{birthday},#{signature},#{imageurl},#{tags})
-  </insert>
+        insert into User(name, mailbox, sex, pass, birthday, signature, imageurl, tags)
+        values (#{name}, #{mailbox}, #{sex}, #{pass}, #{birthday}, #{signature}, #{imageurl}, #{tags})
+    </insert>
 
     <insert id="addBlog" parameterType="com.example.hello.myBatis.po.Blog" useGeneratedKeys="true" keyProperty="id">
-        insert into blog(content, commentNum, tranNum, zanNum, author, date, imageList,avatarUrl) VALUE (#{content},#{commentNum},#{tranNum},#{zanNum},#{author},#{date},#{imageList},#{avatarUrl})
+        insert into blog(content, commentNum, tranNum, zanNum, authorID, date, imageList) VALUE (#{content},
+                                                                                                 #{commentNum},
+                                                                                                 #{tranNum}, #{zanNum},
+                                                                                                 #{authorID}, #{date},
+                                                                                                 #{imageList})
     </insert>
 
-    <select id="selectBlogPage"  resultType="com.example.hello.myBatis.po.Blog">
-        select
-        *
-        from blog
+    <select id="selectBlogPage" resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user
+        where user.id = authorID
     </select>
 
-    <select id="searchBlogPage" parameterType="String" resultType="com.example.hello.myBatis.po.Blog">
-        select * from blog where locate(#{str},content) or locate(#{str},author)
+    <select id="selectBlogPageByBlogID" parameterType="Integer" resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user
+        where blog.id = #{blogID} and user.id = authorID
     </select>
 
-    <insert id="addComment" parameterType="com.example.hello.request.AddCommentRequest" useGeneratedKeys="true" keyProperty="id">
-        insert into comment(blogId, avatarUrl, author, content, time) VALUE (#{blogId},#{avatarUrl},#{author},#{content},#{time})
+    <select id="searchBlogPage" parameterType="String" resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user
+        where user.id = authorID and (locate(#{str}, content)
+           or locate(#{str}, name))
+    </select>
+
+    <insert id="addComment" parameterType="com.example.hello.request.AddCommentRequest" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into comment(blogId, content, time, authorID) VALUE (#{blogId}, #{content}, #{time}, #{authorID})
     </insert>
 
-    <select id="getPageComment" parameterType="Integer" resultType="com.example.hello.myBatis.po.Comment">
-        select * from comment where blogId = #{blogId}
+    <select id="getPageComment" parameterType="Integer" resultType="com.example.hello.response.CommentResponse">
+        select comment.id, blogId, content, time, authorID, name, imageurl
+        from comment,
+             user
+        where user.id = comment.authorID
+          and blogId = #{blogId}
     </select>
+
+   <select id="getBlogByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.Blog">
+       select * from blog where id = #{blogid}
+   </select>
+
+    <update id="updateBlog" parameterType="com.example.hello.myBatis.po.Blog">
+        update blog set content = #{content} , commentNum = #{commentNum},tranNum = #{tranNum},zanNum=#{zanNum},date = #{date},imageList = #{imageList},authorID = #{authorID}
+        where id = #{id}
+    </update>
 
 </mapper>
