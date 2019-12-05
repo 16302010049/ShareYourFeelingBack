@@ -6,6 +6,7 @@ import com.example.hello.myBatis.po.User;
 import com.example.hello.request.AddBlogRequest;
 import com.example.hello.request.PageBlogRequest;
 import com.example.hello.request.SearchPageBlogRequest;
+import com.example.hello.request.TranBlogRequest;
 import com.example.hello.response.BlogResponse;
 import com.example.hello.response.CommonResponse;
 import com.example.hello.response.PageBlogResponse;
@@ -100,5 +101,46 @@ public class BlogController {
         sqlSession.commit();
         sqlSession.close();
         return blogResponse;
+    }
+
+    @RequestMapping(value = "/tranBlog",method = RequestMethod.POST)
+    public @ResponseBody CommonResponse tranBlog(@RequestBody TranBlogRequest tranBlogRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        Blog blog = sqlSession.selectOne("hello.UserMapper.getBlogByID",tranBlogRequest.getBlogID());
+        blog.setTranNum(blog.getTranNum()+1);
+        sqlSession.update("hello.UserMapper.updateBlog",blog);
+        User user = sqlSession.selectOne("hello.UserMapper.findUserByID",tranBlogRequest.getUserID());
+        user.setBlogNum(user.getBlogNum()+1);
+        sqlSession.update("hello.UserMapper.updateUserBlogNum",user);
+        BlogResponse blogResponse = sqlSession.selectOne("hello.UserMapper.selectBlogPageByBlogID",tranBlogRequest.getBlogID());
+        blog.setTranNum(0);
+        blog.setCommentNum(0);
+        blog.setZanNum(0);
+        blog.setDate(tranBlogRequest.getDate());
+        blog.setAuthorID(tranBlogRequest.getUserID());
+        String head = "转发";
+        if(!blog.getContent().startsWith(head)){
+            blog.setContent(head+"自"+blogResponse.getName()+":"+blog.getContent());
+        }
+        sqlSession.insert("hello.UserMapper.addBlog",blog);
+        sqlSession.commit();
+        sqlSession.close();
+        return new CommonResponse("success");
+    }
+
+    @RequestMapping(value = "/deleteBlog",method = RequestMethod.GET)
+    public @ResponseBody CommonResponse deleteBlog(@RequestParam int blogID) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        sqlSession.delete("hello.UserMapper.deleteCollectByBlogID",blogID);
+        sqlSession.delete("hello.UserMapper.deleteCommentByBlogID",blogID);
+        sqlSession.delete("hello.UserMapper.deleteThumbsUpByBlogID",blogID);
+        Blog blog = sqlSession.selectOne("hello.UserMapper.getBlogByID",blogID);
+        User user = sqlSession.selectOne("hello.UserMapper.findUserByID",blog.getAuthorID());
+        user.setBlogNum(user.getBlogNum()-1);
+        sqlSession.update("hello.UserMapper.updateUserBlogNum",user);
+        sqlSession.delete("hello.UserMapper.deleteBlogByBlogID",blogID);
+        sqlSession.commit();
+        sqlSession.close();
+        return new CommonResponse("success");
     }
 }

@@ -3,6 +3,7 @@ package com.example.hello.controller;
 import com.example.hello.myBatis.SqlSessionLoader;
 import com.example.hello.myBatis.po.Other;
 import com.example.hello.myBatis.po.User;
+import com.example.hello.request.GetPageTagUserRequest;
 import com.example.hello.request.GetPageUserRequest;
 import com.example.hello.request.UserLoginRequest;
 import com.example.hello.request.UserRegisterRequest;
@@ -85,6 +86,17 @@ public class UserController {
         return pageUserResponse;
     }
 
-   // @RequestMapping(value = "/getPageUserTags",method = RequestMethod.POST)
-   // public @ResponseBody PageUserResponse getPageTagsUser()
+   @RequestMapping(value = "/getPageUserTags",method = RequestMethod.POST)
+    public @ResponseBody PageUserResponse getPageTagsUser(@RequestBody GetPageTagUserRequest getPageTagUserRequest) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       int pageNum = getPageTagUserRequest.getPageNum();
+       int pageSize = getPageTagUserRequest.getPageSize();
+       PageHelper.startPage(pageNum,pageSize);
+       List<Other> users = sqlSession.selectList("hello.UserMapper.getPageUserByTags",getPageTagUserRequest);
+       PageInfo<Other> userPageInfo = new PageInfo<>(users);
+       PageUserResponse pageUserResponse = new PageUserResponse(userPageInfo.getPageNum(),userPageInfo.getPageSize(),userPageInfo.getTotal(),userPageInfo.getPages(),userPageInfo.getList());
+       sqlSession.commit();
+       sqlSession.close();
+       return pageUserResponse;
+   }
 }

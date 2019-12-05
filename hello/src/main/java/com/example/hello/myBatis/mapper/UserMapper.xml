@@ -10,14 +10,40 @@
         where name = #{name}
     </select>
 
-    <select id="findUserByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
-        select id, name, sex, signature, imageurl, tags, blogNum, guanNum, fansNum, backgroundUrl
+    <select id="findOtherByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
+        select id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
         from user
         where id = #{id}
     </select>
 
-    <select id="getPageUser" parameterType="Integer" resultType="com.example.hello.myBatis.po.User">
-        select * from user where id != #{id}
+    <select id="findUserByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.User">
+        select *
+        from user
+        where id = #{id}
+    </select>
+
+    <select id="getPageUser" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
+        select id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user
+        where id != #{id}
     </select>
 
     <insert id="addUser" parameterType="com.example.hello.myBatis.po.User" useGeneratedKeys="true" keyProperty="id">
@@ -169,5 +195,46 @@
           and blogID = #{blogID}
     </delete>
 
+    <delete id="deleteCollectByBlogID" parameterType="Integer">
+        delete from collect where blogID = #{blogID}
+    </delete>
 
+    <delete id="deleteThumbsUpByBlogID" parameterType="Integer">
+        delete from thumbs_up where blogID = #{blogID}
+    </delete>
+
+    <delete id="deleteCommentByBlogID" parameterType="Integer">
+        delete from comment where blogId = #{blogID}
+    </delete>
+
+    <delete id="deleteBlogByBlogID" parameterType="Integer">
+        delete from blog where id = #{blogID}
+    </delete>
+
+    <select id="getPageUserByTags" parameterType="com.example.hello.request.GetPageTagUserRequest" resultType="com.example.hello.myBatis.po.Other">
+        select id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user
+        where id != #{userID} and JSON_CONTAINS(tags,#{tags})
+    </select>
+
+    <select id="checkFollow" parameterType="com.example.hello.request.CheckFollowRequest" resultType="com.example.hello.myBatis.po.Follow">
+        select * from follow where followerID = #{followerID} and followID = #{followID}
+    </select>
+
+    <insert id="addFollow" parameterType="com.example.hello.request.AddFollowRequest" useGeneratedKeys="true" keyProperty="id">
+        insert into follow(followerID, followID, time) VALUE (#{followerID},#{followID},#{time})
+    </insert>
+
+    <delete id="deleteFollow" parameterType="com.example.hello.request.DeleteFollowRequest">
+        delete from follow where followerID = #{followerID} and followID = #{followID}
+    </delete>
 </mapper>
