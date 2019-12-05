@@ -59,6 +59,18 @@
         where id = #{id}
     </update>
 
+    <update id="updateUserGuanNum" parameterType="com.example.hello.myBatis.po.User">
+        update user set guanNum = #{guanNum}  where id = #{id}
+    </update>
+
+    <update id="updateUserFansNum" parameterType="com.example.hello.myBatis.po.User">
+        update user set fansNum = #{fansNum} where id =#{id}
+    </update>
+
+    <update id="updateUserBackgroundUrl" parameterType="com.example.hello.myBatis.po.User">
+        update user set backgroundUrl = #{backgroundUrl} where id = #{id}
+    </update>
+
     <insert id="addBlog" parameterType="com.example.hello.myBatis.po.Blog" useGeneratedKeys="true" keyProperty="id">
         insert into blog(content, commentNum, tranNum, zanNum, authorID, date, imageList) VALUE (#{content},
                                                                                                  #{commentNum},
@@ -117,6 +129,39 @@
           and (locate(#{str}, content)
             or locate(#{str}, name))
     </select>
+
+    <select id="selectUserBlog" parameterType="com.example.hello.request.GetUserBlogRequest" resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user
+        where user.id = #{userID} and user.id = authorID
+    </select>
+
+    <select id="selectUserBlogReq" parameterType="com.example.hello.request.GetUserBlogRequest" resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user
+        where user.id = #{userID} and user.id = authorID and locate(#{require},content)
+    </select>
+
 
     <insert id="addComment" parameterType="com.example.hello.request.AddCommentRequest" useGeneratedKeys="true"
             keyProperty="id">

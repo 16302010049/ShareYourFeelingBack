@@ -3,10 +3,7 @@ package com.example.hello.controller;
 import com.example.hello.myBatis.SqlSessionLoader;
 import com.example.hello.myBatis.po.Other;
 import com.example.hello.myBatis.po.User;
-import com.example.hello.request.GetPageTagUserRequest;
-import com.example.hello.request.GetPageUserRequest;
-import com.example.hello.request.UserLoginRequest;
-import com.example.hello.request.UserRegisterRequest;
+import com.example.hello.request.*;
 import com.example.hello.response.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -98,5 +95,58 @@ public class UserController {
        sqlSession.commit();
        sqlSession.close();
        return pageUserResponse;
+   }
+
+   @RequestMapping(value = "/getOther",method = RequestMethod.GET)
+    public @ResponseBody Other getOther(@RequestParam int userID) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       Other other = sqlSession.selectOne("hello.UserMapper.findOtherByID",userID);
+       sqlSession.commit();
+       sqlSession.close();
+       return other;
+   }
+
+   @RequestMapping(value = "/modifyBackground", method = RequestMethod.POST)
+    public @ResponseBody User modifyBackground ( ModifyBackgroundRequest modifyBackgroundRequest) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       String fileName = modifyBackgroundRequest.getFile().getOriginalFilename();
+       //获取文件后缀名
+       String suffixName = fileName.substring(fileName.lastIndexOf("."));
+       //重新生成文件名
+       fileName = UUID.randomUUID()+suffixName;
+       //指定本地文件夹存储图片
+       String filePath = "D:/media/";
+       try {
+           //将图片保存到static文件夹里
+           modifyBackgroundRequest.getFile().transferTo(new File(filePath+fileName));
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       User user = sqlSession.selectOne("hello.UserMapper.findUserByID",modifyBackgroundRequest.getUserID());
+       user.setBackgroundUrl("http://localhost:8080/img/"+fileName);
+       sqlSession.update("hello.UserMapper.updateUserBackgroundUrl",user);
+       sqlSession.commit();
+       sqlSession.close();
+       return user;
+   }
+
+   @RequestMapping(value = "/getUserBlogPage",method = RequestMethod.POST)
+    public @ResponseBody PageBlogResponse getUserBlogPage(@RequestBody GetUserBlogRequest getUserBlogRequest) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       int pageNum = getUserBlogRequest.getPageNum();
+       int pageSize = getUserBlogRequest.getPageSize();
+       PageHelper.startPage(pageNum,pageSize);
+       List<BlogResponse> blogResponses;
+       if(getUserBlogRequest.getRequire().equals("")){
+           blogResponses = sqlSession.selectList("hello.UserMapper.selectUserBlog",getUserBlogRequest);
+       }
+       else {
+           blogResponses = sqlSession.selectList("hello.UserMapper.selectUserBlogReq",getUserBlogRequest);
+       }
+       PageInfo<BlogResponse> blogPageInfo = new PageInfo<>(blogResponses);
+       PageBlogResponse pageBlogResponse = new PageBlogResponse(blogPageInfo.getPageNum(),blogPageInfo.getPageSize(),blogPageInfo.getTotal(),blogPageInfo.getPages(),blogPageInfo.getList());
+       sqlSession.commit();
+       sqlSession.close();
+       return pageBlogResponse;
    }
 }

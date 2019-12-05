@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class FollowController {
     @RequestMapping(value = "checkFollow",method = RequestMethod.POST)
-    public @ResponseBody CommonResponse checkFollow(CheckFollowRequest checkFollowRequest) throws IOException{
+    public @ResponseBody CommonResponse checkFollow(@RequestBody CheckFollowRequest checkFollowRequest) throws IOException{
         SqlSession sqlSession = SqlSessionLoader.getSqlSession();
         Follow follow = sqlSession.selectOne("hello.UserMapper.checkFollow",checkFollowRequest);
         sqlSession.commit();
@@ -37,10 +37,10 @@ public class FollowController {
         sqlSession.insert("hello.UserMapper.addFollow",addFollowRequest);
         User follower = sqlSession.selectOne("hello.UserMapper.findUserByID",addFollowRequest.getFollowerID());
         follower.setGuanNum(follower.getGuanNum()+1);
-        sqlSession.update("hello.UserMapper.updateUserBlogNum",follower);
+        sqlSession.update("hello.UserMapper.updateUserGuanNum",follower);
         User follow = sqlSession.selectOne("hello.UserMapper.findUserByID",addFollowRequest.getFollowID());
         follow.setFansNum(follow.getFansNum()+1);
-        sqlSession.update("hello.UserMapper.updateUserBlogNum",follow);
+        sqlSession.update("hello.UserMapper.updateUserFansNum",follow);
         sqlSession.commit();
         sqlSession.close();
         return new CommonResponse("success");
@@ -52,10 +52,10 @@ public class FollowController {
         sqlSession.delete("hello.UserMapper.deleteFollow",deleteFollowRequest);
         User follower = sqlSession.selectOne("hello.UserMapper.findUserByID",deleteFollowRequest.getFollowerID());
         follower.setGuanNum(follower.getGuanNum()-1);
-        sqlSession.update("hello.UserMapper.updateUserBlogNum",follower);
+        sqlSession.update("hello.UserMapper.updateUserGuanNum",follower);
         User follow = sqlSession.selectOne("hello.UserMapper.findUserByID",deleteFollowRequest.getFollowID());
         follow.setFansNum(follow.getFansNum()-1);
-        sqlSession.update("hello.UserMapper.updateUserBlogNum",follow);
+        sqlSession.update("hello.UserMapper.updateUserFansNum",follow);
         sqlSession.commit();
         sqlSession.close();
         return new CommonResponse("success");
