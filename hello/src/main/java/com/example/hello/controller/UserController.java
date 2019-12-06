@@ -135,7 +135,8 @@ public class UserController {
        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
        int pageNum = getUserBlogRequest.getPageNum();
        int pageSize = getUserBlogRequest.getPageSize();
-       PageHelper.startPage(pageNum,pageSize);
+       String orderBy = "date DESC";
+       PageHelper.startPage(pageNum,pageSize,orderBy);
        List<BlogResponse> blogResponses;
        if(getUserBlogRequest.getRequire().equals("")){
            blogResponses = sqlSession.selectList("hello.UserMapper.selectUserBlog",getUserBlogRequest);
@@ -149,4 +150,93 @@ public class UserController {
        sqlSession.close();
        return pageBlogResponse;
    }
+
+   @RequestMapping(value = "/getMyInfo",method = RequestMethod.GET)
+    public @ResponseBody User getMyInfo(@RequestParam int userID) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       User me = sqlSession.selectOne("hello.UserMapper.findUserByID",userID);
+       sqlSession.commit();
+       sqlSession.close();
+       return me;
+   }
+
+   @RequestMapping(value = "/editMyInfo", method = RequestMethod.POST)
+    public @ResponseBody CommonResponse editMyInfo( EditMyInfoRequest editMyInfoRequest) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       User user1 = sqlSession.selectOne("hello.UserMapper.findUserByUsername", editMyInfoRequest.getName());
+       User user = sqlSession.selectOne("hello.UserMapper.findUserByID",editMyInfoRequest.getId());
+       if (user1 != null&& !user.getId().equals(user1.getId())) {
+           sqlSession.commit();
+           sqlSession.close();
+           return  new CommonResponse("用户名已存在");
+       }
+       user.setName(editMyInfoRequest.getName());
+       user.setMailbox(editMyInfoRequest.getMailbox());
+       user.setSex(editMyInfoRequest.getSex());
+       user.setPass(editMyInfoRequest.getPass());
+       user.setBirthday(editMyInfoRequest.getBirthday());
+       user.setSignature(editMyInfoRequest.getSignature());
+       user.setTags(editMyInfoRequest.getTags());
+       if(editMyInfoRequest.getFile()!=null) {
+           String fileName = editMyInfoRequest.getFile().getOriginalFilename();
+           String suffixName = fileName.substring(fileName.lastIndexOf("."));
+           //重新生成文件名
+           fileName = UUID.randomUUID() + suffixName;
+           //指定本地文件夹存储图片
+           String filePath = "D:/media/";
+           try {
+               //将图片保存到static文件夹里
+               editMyInfoRequest.getFile().transferTo(new File(filePath + fileName));
+               user.setImageurl("http://localhost:8080/img/"+fileName);
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+       }
+       sqlSession.update("editMyInfo",user);
+       sqlSession.commit();
+       sqlSession.close();
+       return new CommonResponse("success");
+   }
+
+   @RequestMapping(value = "/getFollow",method = RequestMethod.POST)
+    public @ResponseBody PageUserResponse getFollow(@RequestBody GetFollowPageRequest getFollowPageRequest) throws IOException{
+       SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+       int pageNum = getFollowPageRequest.getPageNum();
+       int pageSize = getFollowPageRequest.getPageSize();
+       String orderBy = "time DESC";
+       PageHelper.startPage(pageNum,pageSize,orderBy);
+       List<Other> others;
+       if(getFollowPageRequest.getStr().equals("")) {
+           others = sqlSession.selectList("hello.UserMapper.getFollow", getFollowPageRequest.getUserID());
+       }
+       else{
+           others = sqlSession.selectList("hello.UserMapper.getFollowStr",getFollowPageRequest);
+       }
+       PageInfo<Other> userPageInfo = new PageInfo<>(others);
+       PageUserResponse pageUserResponse = new PageUserResponse(userPageInfo.getPageNum(),userPageInfo.getPageSize(),userPageInfo.getTotal(),userPageInfo.getPages(),userPageInfo.getList());
+       sqlSession.commit();
+       sqlSession.close();
+       return pageUserResponse;
+   }
+
+    @RequestMapping(value = "/getFans",method = RequestMethod.POST)
+    public @ResponseBody PageUserResponse getFollow(@RequestBody GetFansPageRequest getFansPageRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        int pageNum = getFansPageRequest.getPageNum();
+        int pageSize = getFansPageRequest.getPageSize();
+        String orderBy = "time DESC";
+        PageHelper.startPage(pageNum,pageSize,orderBy);
+        List<Other> others;
+        if(getFansPageRequest.getStr().equals("")) {
+            others = sqlSession.selectList("hello.UserMapper.getFollow", getFansPageRequest.getUserID());
+        }
+        else{
+            others = sqlSession.selectList("hello.UserMapper.getFollowStr",getFansPageRequest);
+        }
+        PageInfo<Other> userPageInfo = new PageInfo<>(others);
+        PageUserResponse pageUserResponse = new PageUserResponse(userPageInfo.getPageNum(),userPageInfo.getPageSize(),userPageInfo.getTotal(),userPageInfo.getPages(),userPageInfo.getList());
+        sqlSession.commit();
+        sqlSession.close();
+        return pageUserResponse;
+    }
 }

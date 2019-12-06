@@ -60,15 +60,21 @@
     </update>
 
     <update id="updateUserGuanNum" parameterType="com.example.hello.myBatis.po.User">
-        update user set guanNum = #{guanNum}  where id = #{id}
+        update user
+        set guanNum = #{guanNum}
+        where id = #{id}
     </update>
 
     <update id="updateUserFansNum" parameterType="com.example.hello.myBatis.po.User">
-        update user set fansNum = #{fansNum} where id =#{id}
+        update user
+        set fansNum = #{fansNum}
+        where id = #{id}
     </update>
 
     <update id="updateUserBackgroundUrl" parameterType="com.example.hello.myBatis.po.User">
-        update user set backgroundUrl = #{backgroundUrl} where id = #{id}
+        update user
+        set backgroundUrl = #{backgroundUrl}
+        where id = #{id}
     </update>
 
     <insert id="addBlog" parameterType="com.example.hello.myBatis.po.Blog" useGeneratedKeys="true" keyProperty="id">
@@ -130,7 +136,8 @@
             or locate(#{str}, name))
     </select>
 
-    <select id="selectUserBlog" parameterType="com.example.hello.request.GetUserBlogRequest" resultType="com.example.hello.response.BlogResponse">
+    <select id="selectUserBlog" parameterType="com.example.hello.request.GetUserBlogRequest"
+            resultType="com.example.hello.response.BlogResponse">
         select blog.id,
                content,
                commentNum,
@@ -143,10 +150,12 @@
                user.id AS authorID
         from blog,
              user
-        where user.id = #{userID} and user.id = authorID
+        where user.id = #{userID}
+          and user.id = authorID
     </select>
 
-    <select id="selectUserBlogReq" parameterType="com.example.hello.request.GetUserBlogRequest" resultType="com.example.hello.response.BlogResponse">
+    <select id="selectUserBlogReq" parameterType="com.example.hello.request.GetUserBlogRequest"
+            resultType="com.example.hello.response.BlogResponse">
         select blog.id,
                content,
                commentNum,
@@ -159,7 +168,9 @@
                user.id AS authorID
         from blog,
              user
-        where user.id = #{userID} and user.id = authorID and locate(#{require},content)
+        where user.id = #{userID}
+          and user.id = authorID
+          and locate(#{require}, content)
     </select>
 
 
@@ -241,22 +252,31 @@
     </delete>
 
     <delete id="deleteCollectByBlogID" parameterType="Integer">
-        delete from collect where blogID = #{blogID}
+        delete
+        from collect
+        where blogID = #{blogID}
     </delete>
 
     <delete id="deleteThumbsUpByBlogID" parameterType="Integer">
-        delete from thumbs_up where blogID = #{blogID}
+        delete
+        from thumbs_up
+        where blogID = #{blogID}
     </delete>
 
     <delete id="deleteCommentByBlogID" parameterType="Integer">
-        delete from comment where blogId = #{blogID}
+        delete
+        from comment
+        where blogId = #{blogID}
     </delete>
 
     <delete id="deleteBlogByBlogID" parameterType="Integer">
-        delete from blog where id = #{blogID}
+        delete
+        from blog
+        where id = #{blogID}
     </delete>
 
-    <select id="getPageUserByTags" parameterType="com.example.hello.request.GetPageTagUserRequest" resultType="com.example.hello.myBatis.po.Other">
+    <select id="getPageUserByTags" parameterType="com.example.hello.request.GetPageTagUserRequest"
+            resultType="com.example.hello.myBatis.po.Other">
         select id,
                name,
                sex,
@@ -268,18 +288,110 @@
                fansNum,
                backgroundUrl
         from user
-        where id != #{userID} and JSON_CONTAINS(tags,#{tags})
+        where id != #{userID}
+          and JSON_CONTAINS(tags, #{tags})
     </select>
 
-    <select id="checkFollow" parameterType="com.example.hello.request.CheckFollowRequest" resultType="com.example.hello.myBatis.po.Follow">
-        select * from follow where followerID = #{followerID} and followID = #{followID}
+    <select id="checkFollow" parameterType="com.example.hello.request.CheckFollowRequest"
+            resultType="com.example.hello.myBatis.po.Follow">
+        select *
+        from follow
+        where followerID = #{followerID}
+          and followID = #{followID}
     </select>
 
-    <insert id="addFollow" parameterType="com.example.hello.request.AddFollowRequest" useGeneratedKeys="true" keyProperty="id">
-        insert into follow(followerID, followID, time) VALUE (#{followerID},#{followID},#{time})
+    <insert id="addFollow" parameterType="com.example.hello.request.AddFollowRequest" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into follow(followerID, followID, time) VALUE (#{followerID}, #{followID}, #{time})
     </insert>
 
     <delete id="deleteFollow" parameterType="com.example.hello.request.DeleteFollowRequest">
-        delete from follow where followerID = #{followerID} and followID = #{followID}
+        delete
+        from follow
+        where followerID = #{followerID}
+          and followID = #{followID}
     </delete>
+
+    <update id="editMyInfo" parameterType="com.example.hello.myBatis.po.User">
+        update user
+        set name      = #{name},
+            mailbox   = #{mailbox},
+            sex       = #{sex},
+            pass      = #{pass},
+            birthday  = #{birthday},
+            signature = #{signature},
+            imageurl  = #{imageurl},
+            tags      = #{tags}
+        where id = #{id}
+    </update>
+
+    <select id="getFollow" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
+    select user.id,
+           name,
+           sex,
+           signature,
+           imageurl,
+           tags,
+           blogNum,
+           guanNum,
+           fansNum,
+           backgroundUrl
+    from user,
+         follow
+    where followerID = #{userID}
+      and followID = user.id
+</select>
+
+    <select id="getFollowStr" parameterType="com.example.hello.request.GetFollowPageRequest" resultType="com.example.hello.myBatis.po.Other">
+        select user.id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user,
+             follow
+        where followerID = #{userID}
+          and followID = user.id
+          and LOCATE(#{str},name)
+    </select>
+
+    <select id="getFans" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
+        select user.id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user,
+             follow
+        where followID = #{userID}
+          and followerID = user.id
+    </select>
+
+    <select id="getFansStr" parameterType="com.example.hello.request.GetFansPageRequest" resultType="com.example.hello.myBatis.po.Other">
+        select user.id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user,
+             follow
+        where followID = #{userID}
+          and followerID = user.id
+          and LOCATE(#{str},name)
+    </select>
 </mapper>
