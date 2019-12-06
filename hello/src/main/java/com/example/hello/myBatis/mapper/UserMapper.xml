@@ -326,23 +326,6 @@
     </update>
 
     <select id="getFollow" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
-    select user.id,
-           name,
-           sex,
-           signature,
-           imageurl,
-           tags,
-           blogNum,
-           guanNum,
-           fansNum,
-           backgroundUrl
-    from user,
-         follow
-    where followerID = #{userID}
-      and followID = user.id
-</select>
-
-    <select id="getFollowStr" parameterType="com.example.hello.request.GetFollowPageRequest" resultType="com.example.hello.myBatis.po.Other">
         select user.id,
                name,
                sex,
@@ -357,7 +340,25 @@
              follow
         where followerID = #{userID}
           and followID = user.id
-          and LOCATE(#{str},name)
+    </select>
+
+    <select id="getFollowStr" parameterType="com.example.hello.request.GetFollowPageRequest"
+            resultType="com.example.hello.myBatis.po.Other">
+        select user.id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user,
+             follow
+        where followerID = #{userID}
+          and followID = user.id
+          and LOCATE(#{str}, name)
     </select>
 
     <select id="getFans" parameterType="Integer" resultType="com.example.hello.myBatis.po.Other">
@@ -377,7 +378,8 @@
           and followerID = user.id
     </select>
 
-    <select id="getFansStr" parameterType="com.example.hello.request.GetFansPageRequest" resultType="com.example.hello.myBatis.po.Other">
+    <select id="getFansStr" parameterType="com.example.hello.request.GetFansPageRequest"
+            resultType="com.example.hello.myBatis.po.Other">
         select user.id,
                name,
                sex,
@@ -392,6 +394,79 @@
              follow
         where followID = #{userID}
           and followerID = user.id
-          and LOCATE(#{str},name)
+          and LOCATE(#{str}, name)
     </select>
+
+
+    <select id="getCollect" parameterType="com.example.hello.request.GetCollectRequest"
+            resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user,
+             collect
+        where collect.userID = #{userID}
+          and collect.blogID = blog.id
+          and user.id = blog.authorID
+    </select>
+
+    <select id="getCollectStr" parameterType="com.example.hello.request.GetCollectRequest"
+            resultType="com.example.hello.response.BlogResponse">
+        select blog.id,
+               content,
+               commentNum,
+               tranNum,
+               zanNum,
+               date,
+               imageList,
+               name,
+               imageurl,
+               user.id AS authorID
+        from blog,
+             user,
+             collect
+        where collect.userID = #{userID}
+          and collect.blogID = blog.id
+          and LOCATE(#{str},blog.content)
+          and user.id = blog.authorID
+    </select>
+
+    <select id="getChatList" parameterType="com.example.hello.request.GetCollectRequest" resultType="com.example.hello.myBatis.po.Other">
+        select distinct user.id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+       from user , follow
+       where (followID = #{userID} and followerID = user.id) or (followerID = #{userID} and followID = user.id)
+    </select>
+
+    <select id="getChatListStr" parameterType="com.example.hello.request.GetCollectRequest" resultType="com.example.hello.myBatis.po.Other">
+        select distinct user.id,
+                        name,
+                        sex,
+                        signature,
+                        imageurl,
+                        tags,
+                        blogNum,
+                        guanNum,
+                        fansNum,
+                        backgroundUrl
+        from user , follow
+        where ((followID = #{userID} and followerID = user.id) or (followerID = #{userID} and followID = user.id)) and LOCATE(#{str},name)
+    </select>
+
 </mapper>

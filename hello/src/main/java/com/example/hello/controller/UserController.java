@@ -228,10 +228,10 @@ public class UserController {
         PageHelper.startPage(pageNum,pageSize,orderBy);
         List<Other> others;
         if(getFansPageRequest.getStr().equals("")) {
-            others = sqlSession.selectList("hello.UserMapper.getFollow", getFansPageRequest.getUserID());
+            others = sqlSession.selectList("hello.UserMapper.getFans", getFansPageRequest.getUserID());
         }
         else{
-            others = sqlSession.selectList("hello.UserMapper.getFollowStr",getFansPageRequest);
+            others = sqlSession.selectList("hello.UserMapper.getFansStr",getFansPageRequest);
         }
         PageInfo<Other> userPageInfo = new PageInfo<>(others);
         PageUserResponse pageUserResponse = new PageUserResponse(userPageInfo.getPageNum(),userPageInfo.getPageSize(),userPageInfo.getTotal(),userPageInfo.getPages(),userPageInfo.getList());
@@ -239,4 +239,39 @@ public class UserController {
         sqlSession.close();
         return pageUserResponse;
     }
+
+    @RequestMapping(value ="/getCollect",method = RequestMethod.POST)
+    public @ResponseBody PageBlogResponse getCollect(@RequestBody GetCollectRequest getCollectRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        int pageNum = getCollectRequest.getPageNum();
+        int pageSize = getCollectRequest.getPageSize();
+        String orderBy = "time DESC";
+        PageHelper.startPage(pageNum,pageSize,orderBy);
+        List<BlogResponse> blogResponses;
+        if(getCollectRequest.getStr().equals("")){
+            blogResponses = sqlSession.selectList("hello.UserMapper.getCollect",getCollectRequest);
+        }
+        else{
+            blogResponses = sqlSession.selectList("hello.UserMapper.getCollectStr",getCollectRequest);
+        }
+        PageInfo<BlogResponse> blogPageInfo = new PageInfo<>(blogResponses);
+        PageBlogResponse pageBlogResponse = new PageBlogResponse(blogPageInfo.getPageNum(),blogPageInfo.getPageSize(),blogPageInfo.getTotal(),blogPageInfo.getPages(),blogPageInfo.getList());
+        sqlSession.commit();
+        sqlSession.close();
+        return pageBlogResponse;
+    }
+
+    @RequestMapping(value = "getChatList",method = RequestMethod.POST)
+    public @ResponseBody List<Other> getChatList(@RequestBody GetCollectRequest getCollectRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        List<Other> others;
+        if(getCollectRequest.getStr().equals("")) {
+            others = sqlSession.selectList("hello.UserMapper.getChatList", getCollectRequest);
+        }
+        else {
+            others = sqlSession.selectList("hello.UserMapper.getChatListStr", getCollectRequest);
+        }
+        return others;
+    }
+
 }
