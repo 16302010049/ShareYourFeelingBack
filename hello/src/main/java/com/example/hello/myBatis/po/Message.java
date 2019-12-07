@@ -6,6 +6,16 @@ public class Message {
     private int userIDBig;
     private String content;
 
+    public Message(){
+
+    }
+
+    public Message(int userIDSmall, int userIDBig, String content) {
+        this.userIDSmall = userIDSmall;
+        this.userIDBig = userIDBig;
+        this.content = content;
+    }
+
     public int getId() {
         return id;
     }

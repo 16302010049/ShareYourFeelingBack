@@ -1,9 +1,8 @@
 package com.example.hello.request;
 
-public class AddMessageRequest {
+public class GetChatRequest {
     private int userIDSmall;
     private int userIDBig;
-    private String content;
 
     public int getUserIDSmall() {
         return userIDSmall;
@@ -19,13 +18,5 @@ public class AddMessageRequest {
 
     public void setUserIDBig(int userIDBig) {
         this.userIDBig = userIDBig;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 }

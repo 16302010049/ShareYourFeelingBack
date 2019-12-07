@@ -469,4 +469,20 @@
         where ((followID = #{userID} and followerID = user.id) or (followerID = #{userID} and followID = user.id)) and LOCATE(#{str},name)
     </select>
 
+    <select id="getChatByID" parameterType="com.example.hello.request.AddMessageRequest" resultType="com.example.hello.myBatis.po.Message">
+        select * from message where userIDSmall = #{userIDSmall} and userIDBig = #{userIDBig}
+    </select>
+
+    <update id="updateChatByID"  parameterType="com.example.hello.myBatis.po.Message">
+        update message set content = #{content} where id=#{id}
+    </update>
+
+    <insert id="insertChat" parameterType="com.example.hello.myBatis.po.Message" useGeneratedKeys="true" keyProperty="id">
+        insert into message(userIDSmall, userIDBig, content) VALUES (#{userIDSmall},#{userIDBig},#{content})
+    </insert>
+
+    <select id="getChatByID2" parameterType="com.example.hello.request.GetChatRequest" resultType="com.example.hello.myBatis.po.Message">
+        select * from message where userIDSmall = #{userIDSmall} and userIDBig = #{userIDBig}
+    </select>
+
 </mapper>

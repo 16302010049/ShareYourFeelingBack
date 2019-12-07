@@ -1,17 +1,19 @@
 package com.example.hello.controller;
 
 import com.example.hello.myBatis.SqlSessionLoader;
-import com.example.hello.myBatis.po.Other;
-import com.example.hello.myBatis.po.User;
+import com.example.hello.myBatis.po.*;
 import com.example.hello.request.*;
 import com.example.hello.response.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -271,7 +273,44 @@ public class UserController {
         else {
             others = sqlSession.selectList("hello.UserMapper.getChatListStr", getCollectRequest);
         }
+        sqlSession.commit();
+        sqlSession.close();
         return others;
+    }
+
+    @RequestMapping(value = "addChat",method = RequestMethod.POST)
+    public @ResponseBody CommonResponse addChat(@RequestBody AddMessageRequest addMessageRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        Message message = sqlSession.selectOne("hello.UserMapper.getChatByID",addMessageRequest);
+        if(message!=null) {
+            Gson gson = new Gson();
+            List<Chat> chatList= gson.fromJson(message.getContent(), new TypeToken<List<Chat>>() {}.getType());
+            Chat newChat = gson.fromJson(addMessageRequest.getContent(), Chat.class);
+            chatList.add(newChat);
+            message.setContent(gson.toJson(chatList));
+            sqlSession.update("hello.UserMapper.updateChatByID",message);
+        }
+        else{
+            Gson gson = new Gson();
+            Chat newChat = gson.fromJson(addMessageRequest.getContent(), Chat.class);
+            List<Chat> chatList = new ArrayList<>();
+            chatList.add(newChat);
+            String content = gson.toJson(chatList);
+            message = new Message(addMessageRequest.getUserIDSmall(),addMessageRequest.getUserIDBig(),content);
+            sqlSession.insert("hello.UserMapper.insertChat",message);
+        }
+        sqlSession.commit();
+        sqlSession.close();
+        return new CommonResponse("success");
+    }
+
+    @RequestMapping(value = "getChat", method = RequestMethod.POST)
+    public @ResponseBody Message getChat(@RequestBody GetChatRequest getChatRequest) throws IOException{
+        SqlSession sqlSession = SqlSessionLoader.getSqlSession();
+        Message message = sqlSession.selectOne("hello.UserMapper.getChatByID2",getChatRequest);
+        sqlSession.commit();
+        sqlSession.close();
+        return message;
     }
 
 }
