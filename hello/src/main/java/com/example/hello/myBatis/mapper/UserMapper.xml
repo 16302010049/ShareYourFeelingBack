@@ -435,26 +435,12 @@
              collect
         where collect.userID = #{userID}
           and collect.blogID = blog.id
-          and LOCATE(#{str},blog.content)
+          and LOCATE(#{str}, blog.content)
           and user.id = blog.authorID
     </select>
 
-    <select id="getChatList" parameterType="com.example.hello.request.GetCollectRequest" resultType="com.example.hello.myBatis.po.Other">
-        select distinct user.id,
-               name,
-               sex,
-               signature,
-               imageurl,
-               tags,
-               blogNum,
-               guanNum,
-               fansNum,
-               backgroundUrl
-       from user , follow
-       where (followID = #{userID} and followerID = user.id) or (followerID = #{userID} and followID = user.id)
-    </select>
-
-    <select id="getChatListStr" parameterType="com.example.hello.request.GetCollectRequest" resultType="com.example.hello.myBatis.po.Other">
+    <select id="getChatList" parameterType="com.example.hello.request.GetCollectRequest"
+            resultType="com.example.hello.myBatis.po.Other">
         select distinct user.id,
                         name,
                         sex,
@@ -465,24 +451,92 @@
                         guanNum,
                         fansNum,
                         backgroundUrl
-        from user , follow
-        where ((followID = #{userID} and followerID = user.id) or (followerID = #{userID} and followID = user.id)) and LOCATE(#{str},name)
+        from user,
+             follow
+        where (followID = #{userID} and followerID = user.id)
+           or (followerID = #{userID} and followID = user.id)
     </select>
 
-    <select id="getChatByID" parameterType="com.example.hello.request.AddMessageRequest" resultType="com.example.hello.myBatis.po.Message">
-        select * from message where userIDSmall = #{userIDSmall} and userIDBig = #{userIDBig}
+    <select id="getChatListStr" parameterType="com.example.hello.request.GetCollectRequest"
+            resultType="com.example.hello.myBatis.po.Other">
+        select distinct user.id,
+                        name,
+                        sex,
+                        signature,
+                        imageurl,
+                        tags,
+                        blogNum,
+                        guanNum,
+                        fansNum,
+                        backgroundUrl
+        from user,
+             follow
+        where ((followID = #{userID} and followerID = user.id) or (followerID = #{userID} and followID = user.id))
+          and LOCATE(#{str}, name)
     </select>
 
-    <update id="updateChatByID"  parameterType="com.example.hello.myBatis.po.Message">
-        update message set content = #{content} where id=#{id}
+    <select id="getChatByID" parameterType="com.example.hello.request.AddMessageRequest"
+            resultType="com.example.hello.myBatis.po.Message">
+        select *
+        from message
+        where userIDSmall = #{userIDSmall}
+          and userIDBig = #{userIDBig}
+    </select>
+
+    <update id="updateChatByID" parameterType="com.example.hello.myBatis.po.Message">
+        update message
+        set content = #{content}
+        where id = #{id}
     </update>
 
-    <insert id="insertChat" parameterType="com.example.hello.myBatis.po.Message" useGeneratedKeys="true" keyProperty="id">
-        insert into message(userIDSmall, userIDBig, content) VALUES (#{userIDSmall},#{userIDBig},#{content})
+    <insert id="insertChat" parameterType="com.example.hello.myBatis.po.Message" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into message(userIDSmall, userIDBig, content)
+        VALUES (#{userIDSmall}, #{userIDBig}, #{content})
     </insert>
 
-    <select id="getChatByID2" parameterType="com.example.hello.request.GetChatRequest" resultType="com.example.hello.myBatis.po.Message">
-        select * from message where userIDSmall = #{userIDSmall} and userIDBig = #{userIDBig}
+    <select id="getChatByID2" parameterType="com.example.hello.request.GetChatRequest"
+            resultType="com.example.hello.myBatis.po.Message">
+        select *
+        from message
+        where userIDSmall = #{userIDSmall}
+          and userIDBig = #{userIDBig}
+    </select>
+
+    <select id="selectGeoByID" parameterType="Integer" resultType="com.example.hello.myBatis.po.GeoHashes">
+        select *
+        from geohash
+        where userID = #{userID}
+    </select>
+
+    <insert id="insertGeo" parameterType="com.example.hello.myBatis.po.GeoHashes" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into geohash(userID, geoString)
+        VALUES (#{userID}, #{geoString})
+    </insert>
+
+    <update id="updateGeo" parameterType="com.example.hello.myBatis.po.GeoHashes">
+        update geohash
+        set geoString = #{geoString}
+        where userID = #{userID}
+    </update>
+
+    <select id="getUserByGeo" parameterType="com.example.hello.myBatis.po.GeoHashes" resultType="com.example.hello.myBatis.po.Other">
+        select user.id,
+               name,
+               sex,
+               signature,
+               imageurl,
+               tags,
+               blogNum,
+               guanNum,
+               fansNum,
+               backgroundUrl
+        from user,
+             geohash
+        where geoString = #{geoString}
+          and userID != #{userID}
+          and userID = user.id
     </select>
 
 </mapper>
